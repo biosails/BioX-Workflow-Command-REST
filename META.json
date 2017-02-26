@@ -37,7 +37,19 @@
       },
       "runtime" : {
          "requires" : {
-            "perl" : "5.008005"
+            "BioX::Workflow::Command::run" : "0",
+            "Capture::Tiny" : "0",
+            "File::Temp" : "0",
+            "HTTP::Status" : "0",
+            "List::Util" : "0",
+            "MooseX::App::Command" : "0",
+            "Plack::Builder" : "0",
+            "Raisin::API" : "0",
+            "Types::Standard" : "0",
+            "feature" : "0",
+            "perl" : "5.008005",
+            "strict" : "0",
+            "warnings" : "0"
          }
       },
       "test" : {

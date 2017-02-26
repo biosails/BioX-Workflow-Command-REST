@@ -1,28 +1,29 @@
 package BioX::Workflow::Command::REST;
+use HTTP::Status qw(:constants);
+use List::Util qw(max);
+use Raisin::API;
+
 
 our $VERSION = '0.01';
 
 use strict;
 use warnings;
-
 use feature 'say';
 
-#use FindBin '$Bin';
-#use lib ("$Bin/../lib", "$Bin/../../../lib");
+api_format 'json';
+api_default_format 'json';
 
-use Raisin::API;
-
-plugin 'Swagger';
 middleware 'CrossOrigin',
     origins => '*',
     methods => [qw/DELETE GET HEAD OPTIONS PATCH POST PUT/],
     headers => [qw/accept authorization content-type api_key_token/];
 
-plugin 'Logger', outputs => [['Screen', min_level => 'debug']];
+plugin 'Swagger';
 
 swagger_setup(
-    title => 'BioX-Workflow REST Application',
-    description => 'BioX-Workflow REST Application',
+    title => 'A POD synopsis API',
+    description => 'An example of API documentation.',
+    terms_of_service => '',
 
     contact => {
         name => 'Jillian Rowe',
@@ -36,24 +37,9 @@ swagger_setup(
     },
 );
 
+plugin 'Logger', outputs => [['Screen', min_level => 'debug']];
+
 mount 'BioX::Workflow::Command::REST::run';
-
-# Utils
-sub paginate {
-    my ($data, $params) = @_;
-
-    my $max_count = scalar(@$data) - 1;
-    my $start = _return_max($params->{start}, $max_count);
-    my $count = _return_max($params->{count}, $max_count);
-
-    my @slice = @$data[$start .. $count];
-    \@slice;
-}
-
-sub _return_max {
-    my ($value, $max) = @_;
-    $value > $max ? $max : $value;
-}
 
 1;
 
