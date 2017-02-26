@@ -1,14 +1,15 @@
 # NAME
 
-BioX::Workflow::Command::REST - Blah blah blah
+BioX::Workflow::Command::REST - REST API for BioX::Workflow::Command
 
 # SYNOPSIS
 
-    use BioX::Workflow::Command::REST;
+    This is an extremely beta release
+    plackup -E deployment -s Starman -p 3001 -r -R `pwd`/lib -a script/biox-app.psgi
 
 # DESCRIPTION
 
-BioX::Workflow::Command::REST is
+BioX::Workflow::Command::REST exposes a REST API for BioX::Workflow::Command
 
 # AUTHOR
 

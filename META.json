@@ -1,5 +1,5 @@
 {
-   "abstract" : "Blah blah blah",
+   "abstract" : "REST API for BioX::Workflow::Command",
    "author" : [
       "Jillian Rowe <jillian.e.rowe@gmail.com>"
    ],
@@ -37,7 +37,19 @@
       },
       "runtime" : {
          "requires" : {
-            "perl" : "5.008005"
+            "BioX::Workflow::Command::run" : "0",
+            "Capture::Tiny" : "0",
+            "File::Temp" : "0",
+            "HTTP::Status" : "0",
+            "List::Util" : "0",
+            "MooseX::App::Command" : "0",
+            "Plack::Builder" : "0",
+            "Raisin::API" : "0",
+            "Types::Standard" : "0",
+            "feature" : "0",
+            "perl" : "5.008005",
+            "strict" : "0",
+            "warnings" : "0"
          }
       },
       "test" : {
@@ -47,6 +59,17 @@
       }
    },
    "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/jerowe/BioX-Workflow-Command-REST/issues"
+      },
+      "homepage" : "https://github.com/jerowe/BioX-Workflow-Command-REST",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/jerowe/BioX-Workflow-Command-REST.git",
+         "web" : "https://github.com/jerowe/BioX-Workflow-Command-REST"
+      }
+   },
    "version" : "0.01",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0225"
 }

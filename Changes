@@ -1,4 +1,5 @@
 Revision history for BioX-Workflow-Command-REST
 
 {{$NEXT}}
+	- This is the v0.0.1 release of the BioX::Workflow::Command::REST api for use with BioSAILs
         - Initial release
