@@ -2,8 +2,28 @@ package Main;
 
 use MooseX::App::Command;
 extends 'BioX::Workflow::Command::run';
+with 'BioX::Workflow::Command::run::Utils::Rules';
 
 option '+workflow' => ( required => 0, );
+
+has 'text_obj' => (
+    is      => 'rw',
+    isa     => 'HashRef',
+    default => sub { {} },
+);
+
+around 'eval_process' => sub {
+    my $orig = shift;
+    my $self = shift;
+
+    my $text = $self->$orig(@_);
+
+    if(! exists $self->text_obj->{$self->rule_name} ){
+      $self->text_obj->{$self->rule_name} = [] ;
+    }
+
+    push(@{$self->text_obj->{$self->rule_name}}, $text);
+};
 
 package BioX::Workflow::Command::REST::run;
 
@@ -90,6 +110,10 @@ resource run => sub {
     post sub {
         my $params = shift;
 
+        print "Params are\n";
+        use Data::Dumper;
+        print Dumper($params);
+
         my $biox = Main->new();
         my $tmp_dir = tempdir( CLEANUP => 0 );
         chdir($tmp_dir);
@@ -98,25 +122,26 @@ resource run => sub {
         my $data         = $params->{data} || $href;
         my $select_rules = $params->{select_rules};
 
-        my($stdout, $stderr, $exit) = capture {
-          $biox->select_rules($select_rules);
-          $biox->stdout(1);
-          $biox->samples($samples);
-          #TODO if using select don't want to print opts or start
-          $biox->print_opts;
-          $biox->workflow_data($href);
-          $biox->apply_global_attributes;
+        my ( $stdout, $stderr, $exit ) = capture {
+            $biox->select_rules($select_rules);
+            $biox->stdout(1);
+            $biox->samples($samples);
 
-          $biox->global_attr->create_outdir(0);
-          $biox->global_attr->coerce_abs_dir(0);
-          $biox->get_global_keys;
+            #TODO if using select don't want to print opts or start
+            $biox->print_opts;
+            $biox->workflow_data($href);
+            $biox->apply_global_attributes;
 
-          $biox->write_workflow_meta('start');
+            $biox->global_attr->create_outdir(0);
+            $biox->global_attr->coerce_abs_dir(0);
+            $biox->get_global_keys;
 
-          $biox->iterate_rules;
+            $biox->write_workflow_meta('start');
+
+            $biox->iterate_rules;
         };
 
-        { process_text => $stdout, logs => $stderr };
+        { process_text => $stdout, logs => $stderr, text_obj => $biox->text_obj };
     };
 };
 
