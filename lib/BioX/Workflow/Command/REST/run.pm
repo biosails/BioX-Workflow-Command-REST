@@ -24,6 +24,8 @@ around 'eval_process' => sub {
     }
 
     push(@{$self->text_obj->{$self->rule_name}}, $text);
+
+    return $text;
 };
 
 package BioX::Workflow::Command::REST::run;
