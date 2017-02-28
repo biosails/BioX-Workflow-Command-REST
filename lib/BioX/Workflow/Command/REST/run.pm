@@ -119,7 +119,7 @@ resource run => sub {
         chdir($tmp_dir);
 
         my $samples      = $params->{samples};
-        my $data         = $params->{data} || $href;
+        my $data         = $params->{data};
         my $select_rules = $params->{select_rules};
 
         my ( $stdout, $stderr, $exit ) = capture {
@@ -130,6 +130,7 @@ resource run => sub {
             #TODO if using select don't want to print opts or start
             $biox->print_opts;
             $biox->workflow_data($data);
+            print Dumper($biox->workflow_data);
             $biox->apply_global_attributes;
 
             $biox->global_attr->create_outdir(0);
