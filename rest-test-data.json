@@ -1,0 +1,113 @@
+{
+    "data": {
+        "global": [{
+                "indir": "R_151215_YOUIDA_M001_pt1of7"
+            },
+            {
+                "outdir": "R_151215_YOUIDA_M001_pt1of7/processed"
+            },
+            {
+                "file_rule": "(15.*)$"
+            },
+            {
+                "by_sample_outdir": 1
+            },
+            {
+                "find_by_dir": 1
+            },
+            {
+                "wait": 0
+            },
+            {
+                "trimmomatic_dir": "R_151215_YOUIDA_M001_pt1of7/processed/{$sample}/trimmomatic"
+            },
+            {
+                "trimmomatic": "R_151215_YOUIDA_M001_pt1of7/processed/{$sample}/trimmomatic"
+            },
+            {
+                "raw_fastqc_dir": "R_151215_YOUIDA_M001_pt1of7/processed/{$sample}"
+            },
+            {
+                "raw_fastqc": "R_151215_YOUIDA_M001_pt1of7/processed/{$sample}"
+            },
+            {
+                "analysis_dir": "R_151215_YOUIDA_M001_pt1of7/processed/analysis"
+            },
+            {
+                "READ1": "{$self->raw_fastqc_dir}/raw_fastqc/{$sample}_read1.fastq.gz"
+            },
+            {
+                "READ2": "{$self->raw_fastqc_dir}/raw_fastqc/{$sample}_read2.fastq.gz"
+            },
+            {
+                "TR1": "{$self->trimmomatic_dir}/{$sample}_read1_trimmomatic"
+            },
+            {
+                "TR2": "{$self->trimmomatic_dir}/{$sample}_read2_trimmomatic"
+            }
+        ],
+        "rules": [{
+                "raw_fastqc": {
+                    "local": [{
+                            "CAT1": "{$self->indir}/*_R1*.fastq.gz"
+                        },
+                        {
+                            "CAT2": "{$self->indir}/*_R1*.fastq.gz"
+                        },
+                        {
+                            "before_meta": "HPC Directives\n\n#\n#HPC jobname=raw_fastqc\n#HPC module=gencore/1 gencore_dev gencore_qc\n#HPC ntasks=1\n#HPC procs=1\n#HPC commands_per_node=1\n#HPC mem=12GB\n#HPC walltime=01:00:00\n#HPC cpus_per_task=3\n#HPC partition=serial\n"
+                        }
+                    ],
+                    "process": "#TASK tags={$sample}_R1\n#mkdir -p {$self->{outdir}}/{$sample}_R1_FASTQC && \\\n#    cat {$self->CAT1} >  {$self->READ1} && \\\n#    fastqc --extract \\\n#    {$self->READ1} \\\n#    -o {$self->{outdir}}/{$sample}_R1_FASTQC/ -t 3\n\n#TASK tags={$sample}_R2\n#mkdir -p {$self->{outdir}}/{$sample}_R2_FASTQC && \\\n#    cat {$self->CAT2} >  {$self->READ2} && \\\n#    fastqc --extract \\\n#    {$self->READ2} \\\n#    -o {$self->{outdir}}/{$sample}_R2_FASTQC/ -t 3\n"
+                }
+            },
+            {
+                "trimmomatic": {
+                    "local": [{
+                        "before_meta": "HPC Directives\n\n#\n#HPC jobname=trimmomatic\n#HPC module=gencore/1 gencore_dev gencore_qc\n#HPC mem=25GB\n#HPC walltime=48:00:00\n#HPC cpus_per_task=12\n#HPC ntasks=1\n#HPC procs=1\n#HPC commands_per_node=1\n#HPC partition=serial\n#\n"
+                    }],
+                    "process": "#TASK tags={$sample}\ntrimmomatic \\\n   PE -threads 12 \\\n   -trimlog {$self->outdir}/{$sample}_trimmomatic.log \\\n   {$self->READ1} \\\n   {$self->READ2} \\\n   {$self->TR1}_1PE.fastq \\\n   {$self->TR1}_1SE.fastq \\\n   {$self->TR2}_2PE.fastq \\\n   {$self->TR2}_2SE.fastq \\\n   TRAILING:3 LEADING:3 SLIDINGWINDOW:4:15 MINLEN:36\n"
+                }
+            },
+            {
+                "trimmomatic_fastqc": {
+                    "local": [{
+                            "OUTPUT": "{$self->outdir}/{$sample}"
+                        },
+                        {
+                            "before_meta": "HPC Directives\n\n#\n#HPC jobname=trimmomatic_fastqc\n#HPC deps=trimmomatic\n#HPC module=gencore/1 gencore_dev gencore_qc\n#HPC mem=12GB\n#HPC ntasks=1\n#HPC procs=1\n#HPC commands_per_node=1\n#HPC walltime=20:00:00\n#HPC cpus_per_task=4\n#HPC partition=serial\n#\n"
+                        }
+                    ],
+                    "process": "#TASK tags={$sample}\nmkdir -p {$self->OUTPUT}_FASTQC_read1_TRIMMED && \\\n    fastqc --extract \\\n    {$self->TR1}_1PE.fastq \\\n    -o {$self->OUTPUT}_FASTQC_read1_TRIMMED/ -t 4\n\n#TASK tags={$sample}\nmkdir -p {$self->OUTPUT}_FASTQC_read2_TRIMMED && \\\n      fastqc --extract \\\n      {$self->TR2}_2PE.fastq \\\n      -o {$self->OUTPUT}_FASTQC_read2_TRIMMED/ -t 4\n"
+                }
+            },
+            {
+                "trimmomatic_gzip": {
+                    "local": [{
+                            "indir": "{$self->trimmomatic}"
+                        },
+                        {
+                            "INPUT": "{$self->trimmomatic}/{$sample}"
+                        },
+                        {
+                            "before_meta": "HPC Directives\n\n#\n#HPC jobname=trimmomatic_gzip\n#HPC deps=trimmomatic\n#HPC mem=10GB\n#HPC module=gencore/1 gencore_dev gencore_qc\n#HPC walltime=12:30:00\n#HPC cpus_per_task=1\n#HPC commands_per_node=1\n#HPC partition=serial\n#\n"
+                        }
+                    ],
+                    "process": "#TASK tags={$sample}\ngzip -f {$self->TR1}_1PE.fastq\n\n#TASK tags={$sample}\ngzip -f {$self->TR2}_2PE.fastq\n"
+                }
+            },
+            {
+                "remove_trimmomatic_logs": {
+                    "local": [{
+                            "create_outdir": 0
+                        },
+                        {
+                            "before_meta": "HPC Directives\n\n#\n#HPC jobname=remove_trimmomatic_logs\n#HPC deps=trimmomatic\n#HPC module=gencore/1 gencore_dev gencore_qc\n#HPC mem=4GB\n#HPC walltime=00:20:00\n#HPC cpus_per_task=1\n#HPC commands_per_node=1\n#HPC partition=serial\n#\n"
+                        }
+                    ],
+                    "process": "#TASK tags={$sample}\nfind {$self->trimmomatic_dir} -name \"*_trimmomatic.log\" -type f -delete\n"
+                }
+            }
+        ]
+    }
+}

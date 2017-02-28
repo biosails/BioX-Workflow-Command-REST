@@ -3,6 +3,7 @@ package Main;
 use MooseX::App::Command;
 extends 'BioX::Workflow::Command::run';
 with 'BioX::Workflow::Command::run::Utils::Rules';
+use Data::Dumper;
 
 option '+workflow' => ( required => 0, );
 
@@ -36,6 +37,8 @@ use Raisin::API;
 use Types::Standard qw(HashRef Any Int Str ArrayRef);
 use File::Temp qw/ tempfile tempdir /;
 use Capture::Tiny ':all';
+use Data::Dumper;
+use Try::Tiny;
 
 my $href = {
     global => [
@@ -110,10 +113,6 @@ resource run => sub {
     post sub {
         my $params = shift;
 
-        print "Params are\n";
-        use Data::Dumper;
-        print Dumper($params);
-
         my $biox = Main->new();
         my $tmp_dir = tempdir( CLEANUP => 0 );
         chdir($tmp_dir);
@@ -130,15 +129,12 @@ resource run => sub {
             #TODO if using select don't want to print opts or start
             $biox->print_opts;
             $biox->workflow_data($data);
-            print Dumper($biox->workflow_data);
             $biox->apply_global_attributes;
 
             $biox->global_attr->create_outdir(0);
             $biox->global_attr->coerce_abs_dir(0);
             $biox->get_global_keys;
-
             $biox->write_workflow_meta('start');
-
             $biox->iterate_rules;
         };
 
