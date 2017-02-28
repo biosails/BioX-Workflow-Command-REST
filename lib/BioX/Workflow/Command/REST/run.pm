@@ -129,7 +129,7 @@ resource run => sub {
 
             #TODO if using select don't want to print opts or start
             $biox->print_opts;
-            $biox->workflow_data($href);
+            $biox->workflow_data($data);
             $biox->apply_global_attributes;
 
             $biox->global_attr->create_outdir(0);
