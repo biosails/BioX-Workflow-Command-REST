@@ -5,7 +5,7 @@ BioX::Workflow::Command::REST - REST API for BioX::Workflow::Command
 # SYNOPSIS
 
     This is an extremely beta release
-    plackup -E deployment -s Starman -p 3001 -r -R `pwd`/lib -a script/biox-app.psgi
+    plackup -E deployment -s Starman -p 3001 -r -R $(pwd)/lib -a script/biox-app.psgi
 
 # DESCRIPTION
 
