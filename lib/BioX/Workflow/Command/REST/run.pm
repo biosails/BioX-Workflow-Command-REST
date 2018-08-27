@@ -7,26 +7,28 @@ use Data::Dumper;
 
 option '+workflow' => ( required => 0, );
 
-has 'text_obj' => (
-    is      => 'rw',
-    isa     => 'HashRef',
-    default => sub { {} },
-);
-
-around 'eval_process' => sub {
-    my $orig = shift;
-    my $self = shift;
-
-    my $text = $self->$orig(@_);
-
-    if(! exists $self->text_obj->{$self->rule_name} ){
-      $self->text_obj->{$self->rule_name} = [] ;
-    }
-
-    push(@{$self->text_obj->{$self->rule_name}}, $text);
-
-    return $text;
-};
+# has 'text_obj' => (
+#     is      => 'rw',
+#     isa     => 'HashRef',
+#     default => sub { {} },
+# );
+#
+# #This is no longer necessary - we get this in the process_obj
+#
+# around 'eval_process' => sub {
+#     my $orig = shift;
+#     my $self = shift;
+#
+#     my $text = $self->$orig(@_);
+#
+#     if(! exists $self->text_obj->{$self->rule_name} ){
+#       $self->text_obj->{$self->rule_name} = [] ;
+#     }
+#
+#     push(@{$self->text_obj->{$self->rule_name}}, $text);
+#
+#     return $text;
+# };
 
 package BioX::Workflow::Command::REST::run;
 
@@ -88,7 +90,7 @@ api_default_format 'json';
 
 desc 'Run a Workflow';
 resource run => sub {
-    summary 'List users';
+    summary 'Run a Workflow';
     params(
         optional(
             'select_rules',
@@ -140,7 +142,7 @@ resource run => sub {
             $biox->iterate_rules;
         };
 
-        { process_text => $stdout, logs => $stderr, text_obj => $biox->text_obj };
+        { process_text => $stdout, logs => $stderr, text_obj => $biox->process_obj };
     };
 };
 
