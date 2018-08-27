@@ -11,6 +11,8 @@ BioX::Workflow::Command::REST - REST API for BioX::Workflow::Command
 
 BioX::Workflow::Command::REST exposes a REST API for BioX::Workflow::Command
 
+This is hopefully the 1.0 version
+
 # AUTHOR
 
 Jillian Rowe <jillian.e.rowe@gmail.com>
