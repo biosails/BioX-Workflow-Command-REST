@@ -2,7 +2,7 @@ package Main;
 
 use MooseX::App::Command;
 extends 'BioX::Workflow::Command::run';
-with 'BioX::Workflow::Command::run::Utils::Rules';
+#with 'BioX::Workflow::Command::run::Utils::Rules';
 use Data::Dumper;
 
 option '+workflow' => ( required => 0, );
